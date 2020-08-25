@@ -159,10 +159,9 @@
         "displayName": "diagnosticStorageAccount"
       },
       "kind": "Storage"
-    },
-         "sku": {
+      "sku": {
         "name": "Aligned"
-      }
+      },
     },
     {
       "type": "Microsoft.Compute/virtualMachines",
