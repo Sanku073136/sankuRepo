@@ -55,7 +55,14 @@
         "Server2016"
       ]
     },
-        "dnsPrefixForPublicIP": {
+    "availabilitySetName": {
+      "defaultValue": "MyAvailabilitySet",
+      "type": "string",
+      "metadata": {
+        "description": "Availability Set Name where the VM will be placed"
+      }
+    },
+    "dnsPrefixForPublicIP": {
       "type": "string",
       "minLength": 1,
       "maxLength": 14,
@@ -89,8 +96,12 @@
         "OfferValue": "WindowsServer",
         "SkuValue": "2016-Datacenter"
       }
-    }
-   },
+    },
+    "availabilitySetPlatformFaultDomainCount": "2",
+    "availabilitySetPlatformUpdateDomainCount": "5",
+    "subnetRef": "[resourceId('Microsoft.Network/virtualNetworks/subnets', variables('myVNETName'),  variables('myVNETSubnet1Name'))]",
+    "networkSecurityGroupName": "default-NSG"
+  },
   "resources": [
     {
       "comments": "Default Network Security Group for template",
@@ -160,7 +171,16 @@
       },
       "kind": "Storage"
     },
-         "sku": {
+    {
+      "type": "Microsoft.Compute/availabilitySets",
+      "name": "[parameters('availabilitySetName')]",
+      "apiVersion": "2017-03-30",
+      "location": "[parameters('location')]",
+      "properties": {
+        "platformFaultDomainCount": "[variables('availabilitySetPlatformFaultDomainCount')]",
+        "platformUpdateDomainCount": "[variables('availabilitySetPlatformUpdateDomainCount')]"
+      },
+      "sku": {
         "name": "Aligned"
       }
     },
@@ -209,7 +229,10 @@
             }
           ]
         },
-         "diagnosticsProfile": {
+        "availabilitySet": {
+          "id": "[resourceId('Microsoft.Compute/availabilitySets', parameters('availabilitySetName'))]"
+        },
+        "diagnosticsProfile": {
           "bootDiagnostics": {
             "enabled": true,
             "storageUri": "[reference(resourceId('Microsoft.Storage/storageAccounts', variables('diagnosticStorageAccountName')), '2016-01-01').primaryEndpoints.blob]"
@@ -217,6 +240,7 @@
         }
       },
       "dependsOn": [
+        "[concat('Microsoft.Compute/availabilitySets/', parameters('availabilitySetName'))]",
         "[concat('Microsoft.Storage/storageAccounts/', variables('diagnosticStorageAccountName'))]",
         "[resourceId('Microsoft.Network/networkInterfaces', concat(parameters('virtualMachineNamePrefix'), copyIndex(1), '-NIC1'))]"
       ]
