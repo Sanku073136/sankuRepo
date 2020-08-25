@@ -158,7 +158,7 @@
       "tags": {
         "displayName": "diagnosticStorageAccount"
       },
-      "kind": "Storage"
+      "kind": "StorageV2"
     },
     {
       "type": "Microsoft.Compute/virtualMachines",
